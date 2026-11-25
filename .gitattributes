@@ -1,0 +1,2 @@
+# Los .sh solo orquestan las mediciones: que GitHub muestre el repo como SQL
+*.sh linguist-detectable=false
