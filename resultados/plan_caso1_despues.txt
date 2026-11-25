@@ -1,0 +1,32 @@
+Limit  (cost=23306.32..23306.44 rows=50 width=58) (actual time=20.205..20.212 rows=50 loops=1)
+  Buffers: shared hit=17650
+  ->  Sort  (cost=23306.32..23314.22 rows=3163 width=58) (actual time=20.204..20.207 rows=50 loops=1)
+        Sort Key: (sum(p.importe)) DESC
+        Sort Method: top-N heapsort  Memory: 31kB
+        Buffers: shared hit=17650
+        ->  GroupAggregate  (cost=23130.08..23201.24 rows=3163 width=58) (actual time=18.843..19.847 rows=2320 loops=1)
+              Group Key: c.id
+              Buffers: shared hit=17647
+              ->  Sort  (cost=23130.08..23137.98 rows=3163 width=24) (actual time=18.834..18.942 rows=3044 loops=1)
+                    Sort Key: c.id
+                    Sort Method: quicksort  Memory: 262kB
+                    Buffers: shared hit=17647
+                    ->  Nested Loop  (cost=164.38..22946.19 rows=3163 width=24) (actual time=0.654..18.121 rows=3044 loops=1)
+                          Buffers: shared hit=17644
+                          ->  Bitmap Heap Scan on clientes c  (cost=163.94..2342.70 rows=5100 width=18) (actual time=0.643..3.378 rows=5211 loops=1)
+                                Recheck Cond: ((provincia)::text = 'Madrid'::text)
+                                Heap Blocks: exact=1951
+                                Buffers: shared hit=1985
+                                ->  Bitmap Index Scan on ix_clientes_provincia_alta  (cost=0.00..162.67 rows=5100 width=0) (actual time=0.446..0.446 rows=5211 loops=1)
+                                      Index Cond: ((provincia)::text = 'Madrid'::text)
+                                      Buffers: shared hit=34
+                          ->  Index Only Scan using ix_pedidos_cliente_fecha on pedidos p  (cost=0.43..4.03 rows=1 width=10) (actual time=0.003..0.003 rows=1 loops=5211)
+                                Index Cond: ((cliente_id = c.id) AND (fecha >= '2025-10-01 00:00:00'::timestamp without time zone) AND (fecha < '2025-11-01 00:00:00'::timestamp without time zone))
+                                Filter: ((estado)::text <> 'CANCELADO'::text)
+                                Rows Removed by Filter: 0
+                                Heap Fetches: 0
+                                Buffers: shared hit=15659
+Planning:
+  Buffers: shared hit=278
+Planning Time: 0.597 ms
+Execution Time: 20.257 ms

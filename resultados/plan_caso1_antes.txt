@@ -1,0 +1,28 @@
+Limit  (cost=59191.21..59191.33 rows=50 width=58) (actual time=142.309..142.316 rows=50 loops=1)
+  Buffers: shared hit=95847
+  ->  Sort  (cost=59191.21..59191.38 rows=69 width=58) (actual time=142.307..142.310 rows=50 loops=1)
+        Sort Key: (sum(p.importe)) DESC
+        Sort Method: top-N heapsort  Memory: 31kB
+        Buffers: shared hit=95847
+        ->  GroupAggregate  (cost=59187.55..59189.10 rows=69 width=58) (actual time=140.923..141.929 rows=2320 loops=1)
+              Group Key: c.id
+              Buffers: shared hit=95844
+              ->  Sort  (cost=59187.55..59187.72 rows=69 width=24) (actual time=140.905..141.020 rows=3044 loops=1)
+                    Sort Key: c.id
+                    Sort Method: quicksort  Memory: 262kB
+                    Buffers: shared hit=95844
+                    ->  Nested Loop  (cost=0.43..59185.44 rows=69 width=24) (actual time=0.101..140.214 rows=3044 loops=1)
+                          Buffers: shared hit=95841
+                          ->  Seq Scan on clientes c  (cost=0.00..5115.00 rows=1000 width=18) (actual time=0.028..37.647 rows=5211 loops=1)
+                                Filter: (upper((provincia)::text) = 'MADRID'::text)
+                                Rows Removed by Filter: 194789
+                                Buffers: shared hit=2115
+                          ->  Index Scan using ix_pedidos_cliente on pedidos p  (cost=0.43..54.06 rows=1 width=10) (actual time=0.015..0.019 rows=1 loops=5211)
+                                Index Cond: (cliente_id = c.id)
+                                Filter: (((estado)::text <> 'CANCELADO'::text) AND (to_char(fecha, 'YYYY-MM'::text) = '2025-10'::text))
+                                Rows Removed by Filter: 14
+                                Buffers: shared hit=93726
+Planning:
+  Buffers: shared hit=203
+Planning Time: 0.583 ms
+Execution Time: 142.369 ms
